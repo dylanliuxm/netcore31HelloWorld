@@ -25,6 +25,7 @@ namespace netcore
         {
             //services.AddApplicationInsightsTelemetry();
             services.AddRazorPages();
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +52,7 @@ namespace netcore
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                endpoints.MapControllers();
             });
         }
     }
