@@ -35,3 +35,5 @@ msbuild.wrn
 
 # Visual Studio
 .vs/
+# 运行时文件日志目录
+logs/
