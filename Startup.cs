@@ -25,6 +25,7 @@ namespace netcore
         {
             //services.AddApplicationInsightsTelemetry();
             services.AddRazorPages();
+            // Enable attribute-routed API controllers (e.g. TimeController)
             services.AddControllers();
         }
 
@@ -52,6 +53,7 @@ namespace netcore
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                // Map [ApiController] routes so GET /api/time is reachable
                 endpoints.MapControllers();
             });
         }
