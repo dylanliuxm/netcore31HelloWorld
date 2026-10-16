@@ -25,6 +25,8 @@ namespace netcore
         {
             //services.AddApplicationInsightsTelemetry();
             services.AddRazorPages();
+            // 启用基于特性路由的 API 控制器（如 TimeController）
+            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,6 +53,8 @@ namespace netcore
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
+                // 映射 [ApiController] 路由，使 GET /api/time 可访问
+                endpoints.MapControllers();
             });
         }
     }
