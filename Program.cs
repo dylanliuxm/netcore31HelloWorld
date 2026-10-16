@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using netcore.Logging;
 
 namespace netcore
 {
@@ -18,6 +19,11 @@ namespace netcore
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                // 追加文件日志提供程序（目录/滚动见 FileLogging 配置）
+                .ConfigureLogging((context, logging) =>
+                {
+                    logging.AddFile(context.Configuration.GetSection("FileLogging"));
+                })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

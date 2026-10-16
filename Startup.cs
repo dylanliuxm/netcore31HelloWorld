@@ -24,6 +24,7 @@ namespace netcore
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddApplicationInsightsTelemetry();
+            // 文件日志在 Program.ConfigureLogging 中通过 AddFile 注册
             services.AddRazorPages();
             // 启用基于特性路由的 API 控制器（如 TimeController）
             services.AddControllers();
