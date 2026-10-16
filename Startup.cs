@@ -25,7 +25,7 @@ namespace netcore
         {
             //services.AddApplicationInsightsTelemetry();
             services.AddRazorPages();
-            // Enable attribute-routed API controllers (e.g. TimeController)
+            // 启用基于特性路由的 API 控制器（如 TimeController）
             services.AddControllers();
         }
 
@@ -53,7 +53,7 @@ namespace netcore
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                // Map [ApiController] routes so GET /api/time is reachable
+                // 映射 [ApiController] 路由，使 GET /api/time 可访问
                 endpoints.MapControllers();
             });
         }

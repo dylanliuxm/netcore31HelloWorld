@@ -4,14 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace netcore.Controllers
 {
     /// <summary>
-    /// Public time API: GET /api/time returns current UTC/local timestamps.
+    /// 公开时间接口：GET /api/time 返回当前 UTC/本地时间戳。
     /// </summary>
     [ApiController]
     [Route("api/time")]
     public class TimeController : ControllerBase
     {
         /// <summary>
-        /// Returns server time as JSON (no auth required).
+        /// 以 JSON 返回服务器时间（无需鉴权）。
         /// </summary>
         [HttpGet]
         public IActionResult Get()
@@ -22,13 +22,13 @@ namespace netcore.Controllers
 
             return Ok(new
             {
-                // UTC instant in ISO-8601 round-trip format
+                // UTC 时刻，ISO-8601 往返格式
                 utc = utcNow.ToString("o"),
-                // Same instant converted to the host's local time zone
+                // 同一时刻转换到主机本地时区
                 local = localNow.ToString("o"),
-                // IANA/Windows id of the host local time zone
+                // 主机本地时区的 IANA/Windows 标识
                 timeZone = localTz.Id,
-                // Unix epoch milliseconds (UTC)
+                // Unix 纪元毫秒（UTC）
                 unixMs = utcNow.ToUnixTimeMilliseconds()
             });
         }
