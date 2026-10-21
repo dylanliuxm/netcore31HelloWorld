@@ -12,3 +12,49 @@
       <span style="margin-left:.5rem;color:#666">需登录；页面调用 <code>/api/time</code></span>
     </p>
 </div>
+
+@if (User?.Identity?.IsAuthenticated == true)
+{
+    <div id="maintenance-notice" class="maintenance-notice" role="dialog" aria-modal="true" aria-labelledby="maintenance-notice-text">
+        <div id="maintenance-notice-box" class="maintenance-notice__box">
+            <button id="maintenance-notice-close" type="button" class="maintenance-notice__close" aria-label="关闭提示">&times;</button>
+            <p id="maintenance-notice-text" class="maintenance-notice__text">每天晚上10点到第二天凌晨6点为系统运维时间，该时间内系统不提供其他服务</p>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    @if (User?.Identity?.IsAuthenticated == true)
+    {
+        <script>
+            (function () {
+                var notice = document.getElementById('maintenance-notice');
+                var box = document.getElementById('maintenance-notice-box');
+                var closeButton = document.getElementById('maintenance-notice-close');
+                if (!notice || !box || !closeButton) {
+                    return;
+                }
+
+                function closeNotice() {
+                    if (notice.parentNode) {
+                        notice.parentNode.removeChild(notice);
+                    }
+                    document.body.classList.remove('maintenance-notice-open');
+                    document.removeEventListener('keydown', onKeyDown);
+                }
+
+                function onKeyDown(event) {
+                    if (event.key === 'Escape') {
+                        closeNotice();
+                    }
+                }
+
+                // 整块提示或右上角关闭按钮均可关闭
+                box.addEventListener('click', closeNotice);
+                document.addEventListener('keydown', onKeyDown);
+                document.body.classList.add('maintenance-notice-open');
+                closeButton.focus();
+            })();
+        </script>
+    }
+}
