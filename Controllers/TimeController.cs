@@ -1,4 +1,5 @@
 using System;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -8,6 +9,7 @@ namespace netcore.Controllers
     /// 公开时间接口：GET /api/time 返回当前 UTC/本地时间戳。
     /// </summary>
     [ApiController]
+    [AllowAnonymous]
     [Route("api/time")]
     public class TimeController : ControllerBase
     {

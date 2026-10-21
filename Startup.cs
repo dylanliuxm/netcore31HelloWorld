@@ -1,10 +1,9 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -20,17 +19,37 @@ namespace netcore
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddApplicationInsightsTelemetry();
             // 文件日志在 Program.ConfigureLogging 中通过 AddFile 注册
-            services.AddRazorPages();
-            // 启用基于特性路由的 API 控制器（如 TimeController）
+
+            services
+                .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/Login";
+                    options.LogoutPath = "/Account/Logout";
+                    options.AccessDeniedPath = "/Account/Login";
+                    options.SlidingExpiration = true;
+                    options.ExpireTimeSpan = TimeSpan.FromHours(8);
+                });
+
+            var requireAuth = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+
+            services.AddRazorPages(options =>
+            {
+                options.Conventions.AllowAnonymousToPage("/Account/Login");
+                options.Conventions.AllowAnonymousToPage("/Error");
+                options.Conventions.AuthorizeFolder("/");
+            });
+
+            // API 控制器单独注册；TimeController 使用 [AllowAnonymous]
             services.AddControllers();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
@@ -40,21 +59,37 @@ namespace netcore
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
+            // 测试容器仅 HTTP（8083→80）；本地 https 配置仍可走重定向
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
+            // 在静态文件之前保护 /time.html（须在 UseAuthentication 之后）
+            app.Use(async (context, next) =>
+            {
+                var path = context.Request.Path.Value ?? string.Empty;
+                if (path.Equals("/time.html", StringComparison.OrdinalIgnoreCase)
+                    && !(context.User?.Identity?.IsAuthenticated ?? false))
+                {
+                    var returnUrl = Uri.EscapeDataString(path + context.Request.QueryString.Value);
+                    context.Response.Redirect("/Account/Login?ReturnUrl=" + returnUrl);
+                    return;
+                }
+
+                await next();
+            });
+
+            app.UseStaticFiles();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapRazorPages();
-                // 映射 [ApiController] 路由，使 GET /api/time 可访问
                 endpoints.MapControllers();
             });
         }
